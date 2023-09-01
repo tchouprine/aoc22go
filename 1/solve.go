@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"cmp"
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 )
 
@@ -38,12 +40,17 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	highest := 0
-	for _, v := range total {
-		if v > highest {
-			highest = v
-		}
+	// getting the top 3
+	slices.SortFunc(total,
+		func(a int, b int) int {
+
+			return cmp.Compare(b, a)
+		})
+	result := 0
+	for i := 0; i < 3; i++ {
+		result += total[i]
 	}
-	fmt.Println(highest)
+
+	fmt.Println(result)
 
 }
