@@ -14,35 +14,38 @@ const (
 )
 
 var CHOICE_TO_SCORE = [3]int{1, 2, 3}
+var OUTCOME_SCORES = [3]int{0, 3, 6}
 
-func getOutcomeScore(a, b int) int {
-	// https://stackoverflow.com/a/2795421
-	result := (3 + a - b) % 3
-	switch result {
+func turnFromOutcome(outcome, opp int) int {
+
+	switch outcome {
 	case 0:
-		// draw
-		return 3
-
-	case 2:
-		// win
-		return 6
+		// walk RPS backwards
+		if opp == 0 {
+			return 2
+		}
+		return opp - 1
 
 	case 1:
-		// lose
-		return 0
+		// stay
+		return opp
+
+	case 2:
+		// walk RPS forward
+		return (opp + 1) % 3
 	}
 	return 0
 }
 
-func calc(opp, player rune) int {
-	oppNum, playerNum :=
+func calc(opp, outcome rune) int {
+	oppNum, outcomeNum :=
 		strings.IndexRune(FIRST_CHIFRE, opp),
-		strings.IndexRune(SECOND_CHIFRE, player)
-
-	choiceScore := CHOICE_TO_SCORE[playerNum]
-	outcomeScore := getOutcomeScore(oppNum, playerNum)
-
-	return choiceScore + outcomeScore
+		strings.IndexRune(SECOND_CHIFRE, outcome)
+	turn := turnFromOutcome(outcomeNum, oppNum)
+	outcomeScore := OUTCOME_SCORES[outcomeNum]
+	choiceScore := CHOICE_TO_SCORE[turn]
+	result := choiceScore + outcomeScore
+	return result
 }
 
 func main() {
@@ -54,12 +57,17 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	result := 0
+
 	for scanner.Scan() {
+
 		letters := []rune(scanner.Text())
 		// account for space
-		opponentChoice, yourChoice := letters[0], letters[2]
+		opponentChoice, outcomeVal := letters[0], letters[2]
+		r := calc(opponentChoice, outcomeVal)
 
-		result += calc(opponentChoice, yourChoice)
+		result += r
+
 	}
 	fmt.Println(result)
+
 }
