@@ -13,19 +13,28 @@ const (
 	alphabetUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
-func runeToValue(letter rune) int {
-	if strings.ContainsRune(alphabetLowerCase, letter) {
-		return strings.IndexRune(alphabetLowerCase, letter) + 1
+func runeToValue(letter string) int {
+	if strings.Contains(alphabetLowerCase, letter) {
+		return strings.Index(alphabetLowerCase, letter) + 1
 	}
-	return strings.IndexRune(alphabetUpperCase, letter) + 27
+	return strings.Index(alphabetUpperCase, letter) + 27
 }
 
-func calc(a, b string) int {
+func calc(a, b, c string) int {
 	if !strings.ContainsAny(a, b) {
 		return 0
 	}
-	sharedLetter := a[strings.IndexAny(a, b)]
-	return runeToValue(rune(sharedLetter))
+	occurrence := strings.IndexAny(a, b)
+	sharedLetter := string(a[occurrence])
+
+	if !strings.Contains(c, sharedLetter) {
+		a = strings.ReplaceAll(a, sharedLetter, "")
+		b = strings.ReplaceAll(b, sharedLetter, "")
+		return calc(a, b, c)
+	} else {
+		return runeToValue(sharedLetter)
+	}
+
 }
 
 func main() {
@@ -37,10 +46,16 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	result := 0
 
+	tmp := []string{}
+
 	for scanner.Scan() {
-		contents := scanner.Text()
-		firstHalf, secondHalf := contents[:len(contents)/2], contents[len(contents)/2:]
-		result += calc(firstHalf, secondHalf)
+		if len(tmp) < 2 {
+			tmp = append(tmp, scanner.Text())
+			continue
+		} else {
+			result += calc(tmp[0], tmp[1], scanner.Text())
+			tmp = []string{}
+		}
 	}
 
 	fmt.Println(result)
