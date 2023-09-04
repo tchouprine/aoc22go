@@ -26,6 +26,10 @@ func parseLine(line string) []int {
 	return result
 }
 
+func inRange(num, a, b int) bool {
+	return num >= a && num <= b
+}
+
 func main() {
 	file, err := os.Open("input.txt")
 	if err != nil {
@@ -36,14 +40,14 @@ func main() {
 	result := 0
 
 	for scanner.Scan() {
-
 		nums := parseLine(scanner.Text())
 		a1, a2, b1, b2 := nums[0], nums[1], nums[2], nums[3]
-		if a1 >= b1 && a2 <= b2 {
+		if inRange(a1, b1, b2) || inRange(a2, b1, b2) {
 			result++
-		} else if b1 >= a1 && b2 <= a2 {
+		} else if inRange(b1, a1, a2) || inRange(b2, a1, a2) {
 			result++
 		}
+
 	}
 	fmt.Println(result)
 }
